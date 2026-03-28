@@ -31,9 +31,6 @@
     </div>
 
     <!-- Catalog Grid -->
-    <h1>This is the Catalog Page</h1>
-
-    <!-- Catalog Grid -->
     <div class="grid grid-cols-4 px-5 mx-5">
         {#each products as product}
             <Card image={product.image} price={product.price} name={product.name} />
