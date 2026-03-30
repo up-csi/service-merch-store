@@ -2,7 +2,6 @@
     import './advance-search.css';
     import SortIcon from '$lib/assets/sort.svg';
     import FilterIcon from '$lib/assets/filter.svg';
-    import Line from '$lib/assets/line.svg';
 
     let filterType1: Record<string, boolean>  = {
         "Keychains": false,
@@ -27,7 +26,7 @@
         <!-- add dropdown code here-->
     </div>
 
-    <img src={Line} />
+    <hr style="border-top: 1px solid #D9D9D9; width: 220px;" />
     
     <!-- Filter -->
     <div class="mt-3 mb-6 flex items-center gap-x-2">
