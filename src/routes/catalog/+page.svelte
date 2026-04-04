@@ -4,13 +4,14 @@
 
 	let { data } = $props();
 	$effect(() => {
-		console.log('data.products:', data.products);
+		console.log('data.products: ', data.products);
+		console.log('data.categories: ', data.categories)
 	});
 </script>
 
 <div class="flex px-5">
-	<div class="w-80 flex-shrink-0">
-		<AdvanceSearch />
+	<div class="w-80 flex-shrink-0" onchange={() => console.log("changed")}>
+		<AdvanceSearch filterType1={data.categories}/>
 	</div>
 
 	<div class="grid grid-cols-4 px-5 mx-5">
