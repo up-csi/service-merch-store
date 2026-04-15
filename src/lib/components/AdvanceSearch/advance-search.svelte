@@ -3,20 +3,10 @@
     import FilterIcon from '$lib/assets/filter.svg';
     import DownButton from '$lib/assets/down-button.svg';
     import RightButton from '$lib/assets/right-button.svg';
-
-    let filterType1: Record<string, boolean>  = $state({
-        "Keychains": false,
-        "Stickers": false,
-        "Prints": false,
-        "Accessories": false
-    });
-
-    let filterType2: Record<string, boolean> = $state({
-        "Filter 1": false,
-        "Filter 2": false,
-        "Filter 3": false,
-        "Filter 4": false
-    });
+	import type { Category } from '$lib/types';
+    
+    let { categoryFilter, selectedFilters = $bindable() }: { categoryFilter: Category[], selectedFilters: string[] } = $props()
+    
 
     let showSortOptions = $state<boolean>(false);
     let showNameOptions = $state<boolean>(false);
@@ -126,22 +116,11 @@
 
     <!-- Filter Type 1 -->
     <div class="mb-6">
-        <h3 style="font-family: 'Inter', sans-serif; font-weight: 400; color: #707070; font-size: 16px;" class="mb-2">Filter Type 1</h3>
-        {#each Object.keys(filterType1) as item}
+        <h3 style="font-family: 'Inter', sans-serif; font-weight: 400; color: #707070; font-size: 16px;" class="mb-2">Categories</h3>
+        {#each categoryFilter as item (item.id)}
             <label class="block mb-1" style="font-family: 'Inter', sans-serif; font-weight: 400; color: #707070; font-size: 14px;">
-                <input type="checkbox" bind:checked={filterType1[item]} class="ml-5 mr-2" />
-                {item}
-            </label>
-        {/each}
-    </div>
-
-    <!-- Filter Type 2 -->
-    <div class="mb-6">
-        <h3 style="font-family: 'Inter', sans-serif; font-weight: 400; color: #707070; font-size: 16px;" class="mb-2">Filter Type 2</h3>
-        {#each Object.keys(filterType2) as item}
-            <label class="block mb-1" style="font-family: 'Inter', sans-serif; font-weight: 400; color: #707070; font-size: 14px;">
-                <input type="checkbox" bind:checked={filterType2[item]} class="ml-5 mr-2" />
-                {item}
+                <input type="checkbox" bind:group={selectedFilters} value={item.category} class="ml-5 mr-2" />
+                {item.category}
             </label>
         {/each}
     </div>
