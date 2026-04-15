@@ -5,13 +5,13 @@
     import RightButton from '$lib/assets/right-button.svg';
 	import type { Category } from '$lib/types';
     
-    let { categoryFilter, selectedFilters = $bindable() }: { categoryFilter: Category[], selectedFilters: string[] } = $props()
+    let { categoryFilter, selectedFilters = $bindable(), selectedSort = $bindable() }: { categoryFilter: Category[], selectedFilters: string[], selectedSort: string } = $props()
     
 
     let showSortOptions = $state<boolean>(false);
     let showNameOptions = $state<boolean>(false);
     let showPriceOptions = $state<boolean>(false);
-    let selectedSort = $state<string>(""); // for backend
+    //let selectedSort = $state<string>(""); // for backend
 
     function handleClickOutside(event: MouseEvent) {
         const sidebar = document.querySelector('.sort-by-container');
