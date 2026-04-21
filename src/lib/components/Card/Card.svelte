@@ -27,7 +27,7 @@
 
     <button 
         class=" w-2/3 mx-auto mt-auto text-sm px-auto py-1 border border-gray-300 text-gray-700 rounded-full hover:bg-black hover:text-white transition-colors"
-        onclick={() => goto('/add-to-cart')} // change accordingly
+        onclick={() => goto(`/product/${encodeURIComponent(name)}`)} // change accordingly
         >
         Buy
     </button>
