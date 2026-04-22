@@ -3,15 +3,54 @@
     import FilterIcon from '$lib/assets/filter.svg';
     import DownButton from '$lib/assets/down-button.svg';
     import RightButton from '$lib/assets/right-button.svg';
-	import type { Category } from '$lib/types';
+    import type { Category } from '$lib/types';
     
-    let { categoryFilter, selectedFilters = $bindable(), selectedPriceSort = $bindable(), selectedNameSort = $bindable() }: { categoryFilter: Category[], selectedFilters: string[], selectedPriceSort: string, selectedNameSort: string } = $props()
-    
+    let { 
+        categoryFilter, 
+        selectedFilters = $bindable(), 
+        selectedPriceSort = $bindable(), 
+        selectedNameSort = $bindable() 
+    }: { 
+        categoryFilter: Category[], 
+        selectedFilters: string[], 
+        selectedPriceSort: string, 
+        selectedNameSort: string 
+    } = $props();
 
     let showSortOptions = $state<boolean>(false);
     let showNameOptions = $state<boolean>(false);
     let showPriceOptions = $state<boolean>(false);
-    //let selectedSort = $state<string>(""); // for backend
+
+    const sortMenuItems = [
+        {
+            label: 'Name',
+            isOpen: () => showNameOptions,
+            toggle: () => {
+                showNameOptions = !showNameOptions;
+                showPriceOptions = false;
+            },
+            options: [
+                { value: 'name-asc', label: 'A - Z' },
+                { value: 'name-desc', label: 'Z - A' }
+            ],
+            selectedValue: () => selectedNameSort,
+            onSelect: (value: string) => selectedNameSort = value
+        },
+        {
+            label: 'Price',
+            isOpen: () => showPriceOptions,
+            toggle: () => {
+                showPriceOptions = !showPriceOptions;
+                showNameOptions = false;
+            },
+            options: [
+                { value: 'price-asc', label: 'Low - High' },
+                { value: 'price-desc', label: 'High - Low' }
+            ],
+            selectedValue: () => selectedPriceSort,
+            onSelect: (value: string) => selectedPriceSort = value
+        }
+    ];
 
     function handleClickOutside(event: MouseEvent) {
         const sidebar = document.querySelector('.sort-by-container');
@@ -26,102 +65,177 @@
         document.addEventListener('click', handleClickOutside);
         return () => document.removeEventListener('click', handleClickOutside);
     });
-
 </script>
 
 <div class="fixed mt-10 ml-15">
     <!-- Sort By -->
     <div class="mb-3 flex items-center gap-x-2 relative sort-by-container">
         <img src={SortIcon} class="w-[24px] h-[24px] align-middle" alt="Sort Icon" />
-        <h3 style="font-family: 'Inter', sans-serif; font-weight: 400; color: #707070; font-size: 18px;">Sort By</h3>
+        <h3 class="section-title">Sort By</h3>
 
         <div class="relative">
-            <button class="" onclick={() =>showSortOptions = !showSortOptions} style="color: #707070;">
-                <img src={DownButton} class="w-[24px] h-[36px] align-middle" alt="Button" />
+            <button onclick={() => showSortOptions = !showSortOptions}>
+                <img src={DownButton} class="w-[24px] h-[36px] align-middle" alt="Toggle sort options" />
             </button>
 
             {#if showSortOptions}
-                <div class="absolute rounded-md top-[28px] left-[-15px] z-50 bg-white shadow-md p-2 w-[180px] flex items-center flex-col ml-4 mb-2">
-                    <div class="flex items-center gap-x-2 relative">
-                        
-                        <!-- Name -->
-                        <div class="hover:bg-[#D9D9D9] flex items-center w-[180px] h-[30px]">
-                            <span class="pl-2" style="font-family: 'Inter', sans-serif; font-weight: 400; color: #707070; font-size: 14px;">Name</span>
-                            <button class=" ml-auto pr-2" onclick={() => {showNameOptions = !showNameOptions; showPriceOptions = false}} style="color: #707070;">
-                                <img src={RightButton} class="w-[12px] h-[24px] align-middle" alt="Button" />
-                            </button>
-                        </div>
-                        
-                        <!-- Name Sorting Options -->
-                        {#if showNameOptions}
-                            <div class="absolute rounded-md top-[5px] left-[98%] z-50 flex flex-col bg-white shadow-md w-[100px] h-[70px] pt-1.5 whitespace-nowrap">
-                                <div class="hover:bg-[#D9D9D9] w-full h-[30px] {selectedNameSort === 'name-asc' ? 'bg-[#D9D9D9]' : ''}">
-                                    <button class="pl-3 w-full text-left" style="font-family: 'Inter', sans-serif; font-weight: 400; color: #707070; font-size: 14px;"
-                                    onclick={() => selectedNameSort = "name-asc"}>
-                                        A - Z
-                                    </button>
-                                </div>
-                                <div class="hover:bg-[#D9D9D9] w-full h-[30px] {selectedNameSort === 'name-desc' ? 'bg-[#D9D9D9]' : ''}">
-                                    <button class="pl-3 w-full text-left" style="font-family: 'Inter', sans-serif; font-weight: 400; color: #707070; font-size: 14px;"
-                                    onclick={() => selectedNameSort = "name-desc"}>
-                                        Z - A
-                                    </button>
-                                </div>
+                <div class="dropdown-menu">
+                    {#each sortMenuItems as item}
+                        <div class="flex items-center gap-x-2 relative">
+                            <!-- Menu  -->
+                            <div class="menu-item">
+                                <span class="menu-label">{item.label}</span>
+                                <button class="ml-auto pr-2" onclick={item.toggle}>
+                                    <img src={RightButton} class="w-[12px] h-[24px] align-middle" alt="Toggle {item.label} options" />
+                                </button>
                             </div>
-                        {/if}
-
-                    </div>
-
-                    <div class="flex items-center gap-x-2 relative">
-                        
-                        <!-- Price -->
-                        <div class="hover:bg-[#D9D9D9] flex items-center w-[180px] h-[30px]">
-                            <span class="pl-2" style="font-family: 'Inter', sans-serif; font-weight: 400; color: #707070; font-size: 14px;">Price</span>
-                            <button class=" ml-auto pr-2" onclick={() => {showPriceOptions = !showPriceOptions; showNameOptions = false}} style="color: #707070;">
-                                <img src={RightButton} class="w-[12px] h-[24px] align-middle" alt="Button" />
-                            </button>
+                            
+                            <!-- Submenu -->
+                            {#if item.isOpen()}
+                                <div class="submenu">
+                                    {#each item.options as option}
+                                        <div class="submenu-item {item.selectedValue() === option.value ? 'selected' : ''}">
+                                            <button 
+                                                class="submenu-button"
+                                                onclick={() => item.onSelect(option.value)}
+                                            >
+                                                {option.label}
+                                            </button>
+                                        </div>
+                                    {/each}
+                                </div>
+                            {/if}
                         </div>
-                        
-                        <!-- Price Sorting Options -->
-                        {#if showPriceOptions}
-                            <div class="absolute rounded-md top-[5px] left-[98%] z-50 flex flex-col bg-white shadow-md w-[100px] h-[70px] pt-1.5 whitespace-nowrap">
-                                <div class="hover:bg-[#D9D9D9] w-full h-[30px] {selectedPriceSort === 'price-asc' ? 'bg-[#D9D9D9]' : ''}">
-                                    <button class="w-full text-left pl-3" style="font-family: 'Inter', sans-serif; font-weight: 400; color: #707070; font-size: 14px;"
-                                    onclick={() => selectedPriceSort = "price-asc"}>
-                                        Low - High
-                                    </button>
-                                </div>
-                                <div class="hover:bg-[#D9D9D9] w-full h-[30px] {selectedPriceSort === 'price-desc' ? 'bg-[#D9D9D9]' : ''}">
-                                    <button class="w-full text-left pl-3" style="font-family: 'Inter', sans-serif; font-weight: 400; color: #707070; font-size: 14px;"
-                                    onclick={() => selectedPriceSort = "price-desc"}>
-                                        High - Low
-                                    </button>
-                                </div>
-                            </div>
-                        {/if}
-
-                    </div>
+                    {/each}
                 </div>
             {/if}
         </div>
     </div>
 
-    <hr style="border-top: 1px solid #D9D9D9; width: 220px;" />
+    <hr class="divider" />
     
-    <!-- Filter -->
+    <!-- Filter  -->
     <div class="mt-3 mb-6 flex items-center gap-x-2">
         <img src={FilterIcon} class="w-[24px] h-[24px] align-middle" alt="Filter Icon" />
-        <h3 style="font-family: 'Inter', sans-serif; font-weight: 400; color: #707070; font-size: 18px;">Filter</h3>
+        <h3 class="section-title">Filter</h3>
     </div>
 
-    <!-- Filter Type 1 -->
+    <!-- Filter Categories -->
     <div class="mb-6">
-        <h3 style="font-family: 'Inter', sans-serif; font-weight: 400; color: #707070; font-size: 16px;" class="mb-2">Categories</h3>
+        <h3 class="filter-subtitle">Categories</h3>
         {#each categoryFilter as item (item.id)}
-            <label class="block mb-1" style="font-family: 'Inter', sans-serif; font-weight: 400; color: #707070; font-size: 14px;">
-                <input type="checkbox" bind:group={selectedFilters} value={item.category} class="ml-5 mr-2" />
+            <label class="filter-checkbox-label">
+                <input 
+                    type="checkbox" 
+                    bind:group={selectedFilters} 
+                    value={item.category} 
+                    class="ml-5 mr-2" 
+                />
                 {item.category}
             </label>
         {/each}
     </div>
 </div>
+
+<style>
+    .section-title {
+        font-family: 'Inter', sans-serif;
+        font-weight: 400;
+        color: #707070;
+        font-size: 18px;
+    }
+
+    .filter-subtitle {
+        font-family: 'Inter', sans-serif;
+        font-weight: 400;
+        color: #707070;
+        font-size: 16px;
+        margin-bottom: 0.5rem;
+    }
+
+    .dropdown-menu {
+        position: absolute;
+        top: 28px;
+        left: -15px;
+        z-index: 50;
+        background-color: white;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        padding: 0.5rem;
+        width: 180px;
+        border-radius: 0.375rem;
+        display: flex;
+        flex-direction: column;
+        margin-left: 1rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .menu-item {
+        display: flex;
+        align-items: center;
+        width: 180px;
+        height: 30px;
+    }
+
+    .menu-item:hover {
+        background-color: #D9D9D9;
+    }
+
+    .menu-label {
+        padding-left: 0.5rem;
+        font-family: 'Inter', sans-serif;
+        font-weight: 400;
+        color: #707070;
+        font-size: 14px;
+    }
+
+    .submenu {
+        position: absolute;
+        top: 5px;
+        left: 98%;
+        z-index: 50;
+        display: flex;
+        flex-direction: column;
+        background-color: white;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        width: 100px;
+        height: 70px;
+        padding-top: 0.375rem;
+        border-radius: 0.375rem;
+        white-space: nowrap;
+    }
+
+    .submenu-item {
+        width: 100%;
+        height: 30px;
+    }
+
+    .submenu-item:hover,
+
+    .submenu-item.selected {
+        background-color: #D9D9D9;
+    }
+
+    .submenu-button {
+        padding-left: 0.75rem;
+        width: 100%;
+        text-align: left;
+        font-family: 'Inter', sans-serif;
+        font-weight: 400;
+        color: #707070;
+        font-size: 14px;
+    }
+
+    .filter-checkbox-label {
+        display: block;
+        margin-bottom: 0.25rem;
+        font-family: 'Inter', sans-serif;
+        font-weight: 400;
+        color: #707070;
+        font-size: 14px;
+    }
+
+    .divider {
+        border-top: 1px solid #D9D9D9;
+        width: 220px;
+    }
+</style>
