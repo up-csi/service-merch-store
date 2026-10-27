@@ -86,7 +86,10 @@ export const actions:Actions =  {
             return {success: true}
         }
 
-    }
+    },
 
+    deleteCartEntry: () => {},
+    
+    editCartEntry: () => {}
 
 }
