@@ -1,5 +1,6 @@
 import { supabase } from '$lib/supabaseClient';
 import type { CartItem } from '$lib/types'
+import { error, fail, json, type Actions } from '@sveltejs/kit';
 
 export async function load({ locals }): Promise<{
     cartItems: CartItem[],
@@ -53,4 +54,39 @@ function getUrl(path:string|null) {
     }
     const {data} = supabase.storage.from("Product Pictures").getPublicUrl(path);
     return data.publicUrl;
+}
+
+export const actions:Actions =  {
+
+    
+    addCartEntry:  async({locals: {supabase}, request}) => {
+        
+        const user = (await supabase.auth.getUser()).data.user
+
+        if(!user) {
+            return fail(401, "User is not logged in")
+        }
+        
+        const data = await request.formData()
+        const variant_id = Number(data.get("variant_id")?.toString() ?? '-1')
+        const count = Number(data.get("count")?.toString() ?? '-1')
+
+        const {error:insert_error} = await supabase.from("ShoppingCartItems").insert(
+            {
+                VariantID: variant_id,
+                Count: count,
+                UserID: user.id
+            }
+        )
+
+        if(insert_error) {
+            return fail(501, {message: insert_error.message})
+        }
+        else {
+            return {success: true}
+        }
+
+    }
+
+
 }
