@@ -82,7 +82,7 @@ export async function load({ params, locals }): Promise<{ product: Product | nul
         name: variantData?.[0]?.VariantName ?? 'Unnamed Variant',
         category: variantData?.[0]?.Products?.[0]?.Category?.[0]?.Category ?? 'No Category',
         stock_amount: variantData?.[0]?.StockAmount ?? 0,
-        cart_amount: cartResult.Count ?? 0
+        cart_amount: cartResult?.Count ?? 0
     };
 
     return { product};
