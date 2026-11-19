@@ -68,7 +68,7 @@ export const actions:Actions =  {
         const user = (await supabase.auth.getUser()).data.user
 
         if(!user) {
-            return fail(403, {message: "User is not logged in"})
+            return fail(401, {message: "User is not logged in"})
         }
         
         const data = Object.fromEntries(await request.formData())
@@ -81,22 +81,18 @@ export const actions:Actions =  {
             return fail(422, {message: "Error Parsing or Evaluating Variant ID and Count arguments"})
         }
 
-        const {data: insert_data, error:insert_error} = await supabase.from("ShoppingCartItems").insert(
-            {
-                VariantID: cart_input.variant_id,
-                Count: cart_input.count,
-                UserID: user.id
-            }
-        ).select("ID")
+        const {data: insert_data, error:insert_error} = await supabase.rpc("upsert_cart_count", {
+            p_variant_id: cart_input.variant_id, p_user_id: user.id, p_count: cart_input.count
+        })
 
         if(insert_error) {
             return fail(501, {message: insert_error.message})
         }
         else {
-            const [{ID}] = insert_data
-           console.log(ID)
+            const [Count] = insert_data
+           console.log(Count)
             
-            return {success: true, ID}
+            return {success: true, Count}
         }
 
     },
@@ -105,7 +101,7 @@ export const actions:Actions =  {
         const user = (await supabase.auth.getUser()).data.user
 
         if(!user) {
-            return fail(403, {message: "User is not logged in"})
+            return fail(401, {message: "User is not logged in"})
         }
 
         const data = await request.formData()
@@ -131,7 +127,7 @@ export const actions:Actions =  {
         const user = (await supabase.auth.getUser()).data.user
 
         if(!user) {
-            return fail(403, {message: "User is not logged in"})
+            return fail(401, {message: "User is not logged in"})
         }
 
         const data = Object.fromEntries(await request.formData())
@@ -167,7 +163,7 @@ export const actions:Actions =  {
         const user = (await supabase.auth.getUser()).data.user
 
         if(!user) {
-            return fail(403, {message: "User is not logged in"})
+            return fail(401, {message: "User is not logged in"})
         }
 
         const data = Object.fromEntries(await request.formData())
