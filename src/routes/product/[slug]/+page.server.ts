@@ -1,7 +1,7 @@
 import { supabase } from '$lib/supabaseClient';
 import type { Product } from '$lib/types'
 
-export async function load({ params }): Promise<{ product: Product | null }> {
+export async function load({ params, locals }): Promise<{ product: Product | null }> {
     const { slug } = params;
     const [ variantResult ] = await Promise.all([
         supabase
@@ -26,6 +26,27 @@ export async function load({ params }): Promise<{ product: Product | null }> {
         .eq('Active', true)
     ])
     
+    const cartFetch = async () => {
+        const user_id = (await locals.supabase.auth.getUser()).data.user?.id
+        console.log(user_id)
+        if(!user_id) {
+            return null
+        }
+        
+        const {data, error} = await locals.supabase.from('Cart').
+            select(`Count`)
+            .eq('VariantID',slug)
+            .eq('UserID',user_id)
+        
+        if (error){
+            return null
+        } 
+        return data[0]
+    }
+
+    const cartResult = await cartFetch()
+    
+
     const { data: variantData, error: variantError } = variantResult
 
     if (variantError) {
@@ -60,8 +81,9 @@ export async function load({ params }): Promise<{ product: Product | null }> {
         price: Number(variantData?.[0]?.SellingPrice) || 0,
         name: variantData?.[0]?.VariantName ?? 'Unnamed Variant',
         category: variantData?.[0]?.Products?.[0]?.Category?.[0]?.Category ?? 'No Category',
-        stock_amount: variantData?.[0]?.StockAmount ?? 0
+        stock_amount: variantData?.[0]?.StockAmount ?? 0,
+        cart_amount: cartResult.Count ?? 0
     };
 
-    return { product };
+    return { product};
 }
