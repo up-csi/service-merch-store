@@ -1,6 +1,6 @@
 import { supabase } from '$lib/supabaseClient';
 import type { CartItem } from '$lib/types';
-import { error, fail, json, type Actions } from '@sveltejs/kit';
+import { fail, redirect, type Actions } from '@sveltejs/kit';
 import * as v from 'valibot'
 import { CreateCartSchema, DeleteCartEntriesSchema, EditCartEntriesSchema } from '$lib/actions/cart.schema.js';
 export async function load({ locals }): Promise<{
@@ -12,7 +12,7 @@ export async function load({ locals }): Promise<{
 	} = await locals.supabase.auth.getUser();
 
 	if (userError || !user) {
-		console.log('Not logged in');
+		throw redirect(303, '/login');
 	}
 
 	const [shoppingCartResult] = await Promise.all([
@@ -27,6 +27,7 @@ export async function load({ locals }): Promise<{
                     ImagePath
                 )
             `)
+			.eq('UserID', user.id)
 			.order('ID', { ascending: true })
 	]);
 
@@ -117,7 +118,8 @@ export const actions:Actions =  {
 
         const {error: delete_error} =await  supabase.from("ShoppingCartItems").
         delete().
-        eq('ID',id)
+        eq('ID',id).
+        eq('UserID',user.id)
         
         if(delete_error) {
             return fail(500, {message: delete_error.message})
@@ -150,7 +152,7 @@ export const actions:Actions =  {
         }
         
         
-        const {error:delete_error} = await supabase.from("ShoppingCartItems").delete().in("ID",input.cartIDs)
+        const {error:delete_error} = await supabase.from("ShoppingCartItems").delete().in("ID",input.cartIDs).eq("UserID",user.id)
 
         //according to Supabase docs, if |cartIDs| > |user's cart entries|, the delete still returns a success
         //i.e. extra IDs are skipped, or ignored.
@@ -180,9 +182,9 @@ export const actions:Actions =  {
 
         let error = null
         if(input.count == 0) {
-            ({error} = await supabase.from("ShoppingCartItems").delete().eq("ID",input.id))
+            ({error} = await supabase.from("ShoppingCartItems").delete().eq("ID",input.id).eq("UserID",user.id))
         } else {
-            ({error} = await supabase.from("ShoppingCartItems").update({Count: input.count}).eq("ID",input.id))
+            ({error} = await supabase.from("ShoppingCartItems").update({Count: input.count}).eq("ID",input.id).eq("UserID",user.id))
         
         }
         if(error) {
