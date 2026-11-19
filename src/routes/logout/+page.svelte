@@ -1,5 +1,6 @@
 <script lang="ts">
   import { refreshAll } from '$app/navigation';
+  import GoogleLogo from "$lib/assets/google-logo.svg";
 
   let { data } = $props();
   let { supabase } = $derived(data);
@@ -22,3 +23,27 @@
         Log Out
     </button>
 </main>
+
+<section class="fixed inset-0 flex items-center justify-center bg-white px-4">
+    <div class="w-full max-w-80 bg-white px-8 py-8 pt-7 rounded-xl shadow-[0_2px_8px_rgba(0,0,0,0.25)] ">
+
+        <h1 class="mb-3 text-center text-3xl font-semibold text-black pb-2">
+            Log Out
+        </h1>
+
+        <form method="POST" action="?/google_logout">
+            <button
+                type="submit"
+                class="flex h-9 w-full items-center justify-center gap-2 rounded-3xl border border-gray-500 bg-white text-xs text-black transition-colors hover:bg-gray-100"
+            >
+                <img
+                    src={GoogleLogo}
+                    alt="Google Logo"
+                    class="h-4 w-4"
+                />
+                <span>Log out/Sign out of UP Mail</span>
+            </button>
+        </form>
+
+    </div>
+</section>
