@@ -45,6 +45,7 @@
 		onDecrement={decrementQuantity}
 		bind:displayModal={displayAlertModal}
 	/>
+	<p>In Cart: {data.product.cart_amount}</p>
 </div>
 {#if displayAlertModal}
 	{#if page.form?.success}
